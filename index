@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean Canvas Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Required dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 60px;
+        }
+
+        .canvas-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #logoPreview {
+            max-height: 60px;
+            max-width: 200px;
+            object-fit: contain;
+        }
+
+        .input-group {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            transition: background-color 0.3s ease;
+        }
+
+        .half-width {
+            grid-column: span 2;
+        }
+
+        .quarter-width {
+            grid-column: span 1;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .word-limit {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Premium Features Section */
+        .premium-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid #e5e7eb;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .premium-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .premium-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .premium-header p {
+            color: #64748b;
+        }
+
+        .premium-features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .premium-feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        .feature-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .feature-description {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .premium-controls {
+            display: none;
+        }
+
+        .theme-selector {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        .custom-color-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-button,
+        .apply-color-btn {
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .export-button:hover,
+        .apply-color-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .premium-button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 18px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .premium-button:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 768px) {
+            .canvas-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .half-width,
+            .quarter-width {
+                grid-column: span 1;
+            }
+
+            .premium-features-list {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="leanCanvasForm">
+        <div class="container" id="canvasContainer">
+            <div class="logo-container">
+                <img id="logoPreview" style="display: none;" />
+            </div>
+
+            <div class="canvas-content">
+                <div class="input-group half-width">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name">
+                </div>
+                <div class="input-group half-width">
+                    <label for="businessName">Business Name:</label>
+                    <input type="text" id="businessName" name="businessName" placeholder="Enter your business name">
+                </div>
+
+                <div class="input-group quarter-width">
+                    <label for="problem">Problem:</label>
+                    <textarea id="problem" name="problem" placeholder="List your top 1-3 problems" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+                <div class="input-group quarter-width">
+                    <label for="solution">Solution:</label>
+                    <textarea id="solution" name="solution" placeholder="Outline possible solutions" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+
+                <div class="input-group quarter-width">
+                    <label for="uniqueValue">Unique Value Proposition:</label>
+                    <textarea id="uniqueValue" name="uniqueValue" placeholder="Your compelling message" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+                <div class="input-group quarter-width">
+                    <label for="unfairAdvantage">Unfair Advantage:</label>
+                    <textarea id="unfairAdvantage" name="unfairAdvantage" placeholder="What can't be easily copied?" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+
+                <div class="input-group quarter-width">
+                    <label for="customerSegments">Customer Segments:</label>
+                    <textarea id="customerSegments" name="customerSegments" placeholder="Target customers" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+                <div class="input-group quarter-width">
+                    <label for="keyMetrics">Key Metrics:</label>
+                    <textarea id="keyMetrics" name="keyMetrics" placeholder="Key numbers to track" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+
+                <div class="input-group quarter-width">
+                    <label for="channels">Channels:</label>
+                    <textarea id="channels" name="channels" placeholder="Path to customers" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+                <div class="input-group quarter-width">
+                    <label for="costStructure">Cost Structure:</label>
+                    <textarea id="costStructure" name="costStructure" placeholder="Fixed and variable costs" maxlength="100"></textarea>
+                    <div class="word-limit">Max 100 words</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-section">
+            <div class="premium-header">
+                <h2>Upgrade to Premium</h2>
+                <p>Take your business planning to the next level with premium features</p>
+            </div>
+
+            <div class="premium-features-list">
+                <div class="premium-feature-card">
+                    <div class="feature-overlay">
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="feature-title">Custom Branding</div>
+                    <div class="feature-description">
+                        • Upload your company logo<br>
+                        • Personalize your canvas appearance<br>
+                        • Create a professional look
+                    </div>
+                    <div class="premium-controls">
+                        <input type="file" accept="image/*" id="logoUpload" />
+                    </div>
+                </div>
+
+                <div class="premium-feature-card">
+                    <div class="feature-overlay">
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="feature-title">Theme Customization</div>
+                    <div class="feature-description">
+                        • Choose from multiple themes<br>
+                        • Create custom color schemes<br>
+                        • Match your brand identity
+                    </div>
+                    <div class="premium-controls">
+                        <select class="theme-selector" id="themeSelector" onchange="handleThemeChange(this.value)">
+                            <option value="#FFFFFF">Light Theme</option>
+                            <option value="#F0F9FF">Blue Theme</option>
+                            <option value="#F0FDF4">Green Theme</option>
+                            <option value="#FDF2F8">Pink Theme</option>
+                        </select>
+                        <div class="custom-color-picker">
+                            <input type="color" id="customColorInput" style="width: 50px; height: 30px;">
+                            <button type="button" onclick="applyCustomColor(event)" class="apply-color-btn">Apply Custom Color</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-feature-card">
+                    <div class="feature-overlay">
+                        <span class="lock-icon">🔒</span>
+                    </div>
+                    <div class="feature-title">Export & Share</div>
+                    <div class="feature-description">
+                        • Download as high-quality PNG<br>
+                        • Export as professional PDF<br>
+                        • Perfect for presentations
+                    </div>
+                    <div class="premium-controls">
+                        <div class="export-buttons">
+                            <button type="button" onclick="exportAsPNG()" class="export-button">Download PNG</button>
+                            <button type="button" onclick="exportAsPDF()" class="export-button">Download PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="https://buy.stripe.com/dR63fHbo3c8HdQk28d?success_url=https://leancanvas.carrd.co?payment_status=completed" class="premium-button">
+                Unlock Premium Features - $14.99
+            </a>
+        </div>
+    </form>
+</body>
+</html>
+<script>
+    // Word limit validation
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            const maxLength = this.getAttribute('maxlength');
+            if (this.value.length > maxLength) {
+                this.value = this.value.slice(0, maxLength);
+            }
+        });
+    });
+
+    // Premium features activation
+    function checkPaymentStatus() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentStatus = urlParams.get('payment_status');
+        
+        if (paymentStatus === 'completed') {
+            localStorage.setItem('premiumUser', 'true');
+            activatePremiumFeatures();
+        }
+    }
+
+    function activatePremiumFeatures() {
+        document.querySelectorAll('.feature-overlay').forEach(overlay => {
+            overlay.style.display = 'none';
+        });
+        
+        document.querySelectorAll('.premium-controls').forEach(control => {
+            control.style.display = 'block';
+        });
+        
+        document.querySelector('.premium-button').style.display = 'none';
+
+        // Enable logo upload with preview
+        const logoUpload = document.getElementById('logoUpload');
+        const logoPreview = document.getElementById('logoPreview');
+
+        logoUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgData = e.target.result;
+                    logoPreview.src = imgData;
+                    logoPreview.style.display = 'block';
+                    localStorage.setItem('logoData', imgData);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Restore logo if previously uploaded
+        const savedLogo = localStorage.getItem('logoData');
+        if (savedLogo) {
+            logoPreview.src = savedLogo;
+            logoPreview.style.display = 'block';
+        }
+    }
+
+    // Theme functions
+    function handleThemeChange(value) {
+        applyTheme(value);
+    }
+
+    function applyTheme(colorCode) {
+        const tiles = document.querySelectorAll('.input-group');
+        tiles.forEach(tile => {
+            tile.style.backgroundColor = colorCode;
+        });
+        localStorage.setItem('themeColor', colorCode);
+    }
+
+    function applyCustomColor(e) {
+        e.preventDefault();
+        const customColorInput = document.getElementById('customColorInput');
+        const color = customColorInput.value;
+        applyTheme(color);
+    }
+
+    // Export functions
+    async function exportAsPNG() {
+        const premiumSection = document.querySelector('.premium-section');
+        const container = document.getElementById('canvasContainer');
+        const originalBg = container.style.backgroundColor;
+        const originalPadding = container.style.padding;
+
+        try {
+            // Hide premium section and prepare canvas for export
+            premiumSection.style.display = 'none';
+            container.style.backgroundColor = '#ffffff';
+            container.style.padding = '20px';
+            
+            // Force logo to show during export if it exists
+            const logoPreview = document.getElementById('logoPreview');
+            const originalLogoDisplay = logoPreview.style.display;
+            if (logoPreview.src) {
+                logoPreview.style.display = 'block';
+            }
+
+            const options = {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                foreignObjectRendering: true,
+                backgroundColor: '#ffffff',
+                height: container.scrollHeight,
+                width: container.scrollWidth,
+                onclone: function(clonedDoc) {
+                    const clonedContainer = clonedDoc.getElementById('canvasContainer');
+                    clonedContainer.style.transform = 'none';
+                    const clonedLogo = clonedDoc.getElementById('logoPreview');
+                    if (clonedLogo && clonedLogo.src) {
+                        clonedLogo.style.display = 'block';
+                    }
+                }
+            };
+
+            const canvas = await html2canvas(container, options);
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = 'lean-canvas.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('PNG Export error:', error);
+            alert('There was an error generating the PNG. Please try again.');
+        } finally {
+            // Restore original state
+            premiumSection.style.display = 'block';
+            container.style.backgroundColor = originalBg;
+            container.style.padding = originalPadding;
+            if (logoPreview) {
+                logoPreview.style.display = originalLogoDisplay;
+            }
+        }
+    }
+
+    async function exportAsPDF() {
+        const premiumSection = document.querySelector('.premium-section');
+        const container = document.getElementById('canvasContainer');
+        const originalBg = container.style.backgroundColor;
+        const originalPadding = container.style.padding;
+        
+        // Force logo to show during export if it exists
+        const logoPreview = document.getElementById('logoPreview');
+        const originalLogoDisplay = logoPreview.style.display;
+        if (logoPreview.src) {
+            logoPreview.style.display = 'block';
+        }
+
+        try {
+            // Prepare container for export
+            premiumSection.style.display = 'none';
+            container.style.backgroundColor = '#ffffff';
+            container.style.padding = '20px';
+
+            const opt = {
+                margin: [0.5, 0.5],
+                filename: 'lean-canvas.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    foreignObjectRendering: true,
+                    backgroundColor: '#ffffff',
+                    height: container.scrollHeight,
+                    width: container.scrollWidth
+                },
+                jsPDF: {
+                    unit: 'in',
+                    format: 'a4',
+                    orientation: 'landscape'
+                }
+            };
+
+            await html2pdf().set(opt).from(container).save();
+
+        } catch (error) {
+            console.error('PDF Export error:', error);
+            alert('There was an error generating the PDF. Please try again.');
+        } finally {
+            // Restore original state
+            premiumSection.style.display = 'block';
+            container.style.backgroundColor = originalBg;
+            container.style.padding = originalPadding;
+            if (logoPreview) {
+                logoPreview.style.display = originalLogoDisplay;
+            }
+        }
+    }
+
+    // Restore theme on page load
+    function restoreTheme() {
+        const savedColor = localStorage.getItem('themeColor');
+        if (savedColor) {
+            applyTheme(savedColor);
+            // Update color picker if custom color was used
+            const customColorInput = document.getElementById('customColorInput');
+            if (customColorInput) {
+                customColorInput.value = savedColor;
+            }
+            // Update theme selector if preset color was used
+            const themeSelector = document.getElementById('themeSelector');
+            if (themeSelector) {
+                const option = Array.from(themeSelector.options).find(opt => opt.value === savedColor);
+                if (option) {
+                    themeSelector.value = savedColor;
+                }
+            }
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        checkPaymentStatus();
+        if (localStorage.getItem('premiumUser') === 'true') {
+            activatePremiumFeatures();
+            restoreTheme();
+        }
+    });
+</script>
